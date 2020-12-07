@@ -43,8 +43,10 @@ def process_log_file(cur, filepath):
     time_data = time_data_list2
     column_labels = ('timestamp','hour','day','week_of_year','month','year','weekday')
     time_df = pd.DataFrame(time_data, columns=column_labels  )
-
+    
+ 
     for i, row in time_df.iterrows():
+        #print(list(row))
         cur.execute(time_table_insert, list(row))
 
     # load user table
@@ -56,18 +58,16 @@ def process_log_file(cur, filepath):
 
     # insert songplay records
     for index, row in df.iterrows():
-        if (row.song and row.artist and row.length):
+        # (row.song and row.artist and row.length):
+   
+        # get songid and artistid from song and artist tables
+        cur.execute(song_select, (row.song, row.artist, str(row.length)))
+        results = cur.fetchone()
         
-            row.song = row.song.encode('ascii', 'ignore').decode('ascii')
-            row.artist = row.artist.encode('ascii', 'ignore').decode('ascii')
-            # get songid and artistid from song and artist tables
-            cur.execute(song_select, (row.song, row.artist, row.length))
-            results = cur.fetchone()
-        
-            if results:
-                songid, artistid = results
-            else:
-                songid, artistid = None, None
+        if results:
+            songid, artistid = results
+        else:
+            songid, artistid = None, None
 
         # insert songplay record
         songplay_data = ( t[index], row.userId, row.level,songid, artistid, row.sessionId , row.location, row.userAgent )

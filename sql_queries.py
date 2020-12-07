@@ -21,7 +21,9 @@ time_table_create = "CREATE TABLE IF NOT EXISTS time (start_time text, hour int,
 
 # INSERT RECORDS
 
-songplay_table_insert = "INSERT INTO songplay (songplay_id, start_time, user_id, level, song_id, artist_id, session_id, location, user_agent) VALUES (%s, %s, %s, %s, %s, %s, %s,%s, %s)"
+#songplay_table_insert = "INSERT INTO songplay (songplay_id, start_time, user_id, level, song_id, artist_id, session_id, location, user_agent) VALUES (%s, %s, %s, %s, %s, %s, %s,%s, %s)"
+
+songplay_table_insert = "INSERT INTO songplays (start_time, user_id, level, song_id, artist_id,session_id, location, user_agent ) VALUES (%s,%s,%s,%s, %s,%s, %s,%s)"
 
 user_table_insert = "INSERT INTO users (user_id, first_name, last_name, gender, level) VALUES (%s, %s ,%s ,%s, %s)"
 
