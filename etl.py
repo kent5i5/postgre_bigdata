@@ -6,8 +6,9 @@ from sql_queries import *
 
 
 def process_song_file(cur, filepath):
-    # open song file
-    #df = pd.read_csv(filepath)
+     """Insert records into songs and artists tables using data from a single song_data file."""
+    
+    # open song file 
     df = pd.read_json(filepath,  typ='serious')
 
     # insert song record
@@ -26,8 +27,10 @@ def process_song_file(cur, filepath):
 
 
 def process_log_file(cur, filepath):
-    # open log file
-    df = pd.read_json(filepath, lines=True)
+    """Insert records into dimension tables time,user tables and the fact table-songplays using data from a single log_data file."""
+    
+    # open log file - log file contains everything except for song_id and artisti_id
+    df = pd.read_json(filepath, lines=True) 
 
     # filter by NextSong action
     df = df.loc[df['page'] == 'NextSong']
@@ -44,7 +47,7 @@ def process_log_file(cur, filepath):
     column_labels = ('timestamp','hour','day','week_of_year','month','year','weekday')
     time_df = pd.DataFrame(time_data, columns=column_labels  )
     
- 
+    #Insert data intothe time table with a loop since we have more than 1 row
     for i, row in time_df.iterrows():
         #print(list(row))
         cur.execute(time_table_insert, list(row))
@@ -75,6 +78,19 @@ def process_log_file(cur, filepath):
 
 
 def process_data(cur, conn, filepath, func):
+    """Retrieve files path as a list-all_files and iterate through each file with both process_log_file and process_song_file mehtod
+        Parameters:
+        cur: the cursor of postgre database
+        conn: postgre database connection
+        filepath: log/song files location
+        func: name of the function: process_song_file/process_log_file
+        
+        Ouput:
+        Fact table: singplays 
+        Dimension table: time, users, songs, artists
+    
+    """
+    
     # get all files matching extension from directory
     all_files = []
     for root, dirs, files in os.walk(filepath):
@@ -96,7 +112,7 @@ def process_data(cur, conn, filepath, func):
 def main():
     conn = psycopg2.connect("host=127.0.0.1 dbname=studentdb user=student password=student")
     cur = conn.cursor()
-    conn.set_client_encoding('UTF8')
+    conn.set_client_encoding('UTF8') # enforced the encode of string with UTF8
 
     process_data(cur, conn, filepath='data/song_data', func=process_song_file)
     process_data(cur, conn, filepath='data/log_data', func=process_log_file)
