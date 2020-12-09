@@ -62,10 +62,13 @@
         conn = psycopg2.connect("host=127.0.0.1 dbname=studentdb user=student password=student")
         cur = conn.cursor()  
         conn.set_client_encoding('UTF8')  
-    ```
+    ``` and I found the 1 row with both song_id and artist_id
     
 ***I run both create_tables.py and etl.py successfully***
 
 ***I double check the data with test.ipynb and songplays has all the datas.***
+
+***I also run count the number which is 6820 but I found 0 row with both song_id and artist_id***
+
 
     

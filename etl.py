@@ -6,31 +6,40 @@ from sql_queries import *
 
 
 def process_song_file(cur, filepath):
-     """Insert records into songs and artists tables using data from a single song_data file."""
-    
-    # open song file 
-    df = pd.read_json(filepath,  typ='serious')
+    """Insert records into songs and artists tables using data from a single song_data file."""
+        
+    # open song file
+    df = pd.read_json(filepath,  typ='serious') 
 
     # insert song record
-    song_data = pd.DataFrame(df, index=["song_id","title","artist_id", "year", "duration"] )
-    song_data = song_data.values.tolist()
+    song_data = pd.DataFrame(df, index=["song_id","title",
+                                        "artist_id", "year", 
+                                        "duration"] )
+    song_data = song_data.values.tolist() # Change the data to list
     try:
         cur.execute(song_table_insert, song_data)
     except psycopg2.Error as e: 
         print("Error:this line has corrupted data")
         print (e)
     
-    # insert artist record
-    artist_data = pd.DataFrame(df, index=['artist_id', 'artist_name', 'artist_location', 'artist_latitude ', 'artist_longitude'])
+    # insert artist record 
+    artist_data = pd.DataFrame(df, index=['artist_id',
+        'artist_name', 
+        'artist_location', 
+        'artist_latitude ', 
+        'artist_longitude']
+    )
+    
+    # Change the data to list for cur.execute to work
     artist_data = artist_data.values.tolist()
     cur.execute(artist_table_insert, artist_data)
 
 
 def process_log_file(cur, filepath):
-    """Insert records into dimension tables time,user tables and the fact table-songplays using data from a single log_data file."""
+    """Insert records into time and user tables using data from a single log_data file."""
     
-    # open log file - log file contains everything except for song_id and artisti_id
-    df = pd.read_json(filepath, lines=True) 
+    # open log file
+    df = pd.read_json(filepath, lines=True)
 
     # filter by NextSong action
     df = df.loc[df['page'] == 'NextSong']
@@ -47,7 +56,7 @@ def process_log_file(cur, filepath):
     column_labels = ('timestamp','hour','day','week_of_year','month','year','weekday')
     time_df = pd.DataFrame(time_data, columns=column_labels  )
     
-    #Insert data intothe time table with a loop since we have more than 1 row
+    # Loop through each time row and insert into time table
     for i, row in time_df.iterrows():
         #print(list(row))
         cur.execute(time_table_insert, list(row))
@@ -68,29 +77,18 @@ def process_log_file(cur, filepath):
         results = cur.fetchone()
         
         if results:
-            songid, artistid = results
+            songid, artistid = results.song_id,results.artist_id
+            print(song_id)
         else:
             songid, artistid = None, None
 
         # insert songplay record
-        songplay_data = ( t[index], row.userId, row.level,songid, artistid, row.sessionId , row.location, row.userAgent )
+        songplay_data = 
+            ( t[index], row.userId, row.level,songid, artistid, row.sessionId , row.location, row.userAgent )
         cur.execute(songplay_table_insert, songplay_data)
 
 
 def process_data(cur, conn, filepath, func):
-    """Retrieve files path as a list-all_files and iterate through each file with both process_log_file and process_song_file mehtod
-        Parameters:
-        cur: the cursor of postgre database
-        conn: postgre database connection
-        filepath: log/song files location
-        func: name of the function: process_song_file/process_log_file
-        
-        Ouput:
-        Fact table: singplays 
-        Dimension table: time, users, songs, artists
-    
-    """
-    
     # get all files matching extension from directory
     all_files = []
     for root, dirs, files in os.walk(filepath):
@@ -110,10 +108,13 @@ def process_data(cur, conn, filepath, func):
 
 
 def main():
-    conn = psycopg2.connect("host=127.0.0.1 dbname=studentdb user=student password=student")
+    conn = psycopg2.connect("host=127.0.0.1 dbname=sparkifydb user=student password=student")
     cur = conn.cursor()
-    conn.set_client_encoding('UTF8') # enforced the encode of string with UTF8
+    
+    """ This line fix a encoding problem during the runtime """
+    conn.set_client_encoding('UTF8')
 
+     
     process_data(cur, conn, filepath='data/song_data', func=process_song_file)
     process_data(cur, conn, filepath='data/log_data', func=process_log_file)
 
