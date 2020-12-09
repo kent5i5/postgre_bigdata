@@ -2,9 +2,11 @@
 
 ###### In this project, I am to create star scheme ( fact + dimension tables) which is a better format for data wirehousing. It provides better query efficiency  as well as easy understand of the tables by forgoing some relation database requirements. 
 
+
 ***I follow the steps and finish etl.ipynb where I am able to create songs, artists, time, users tables***
 
-    I want to explain time and songplays table 
+
+###### Explanation of time and songplays table 
 
 * For time table, I need to convert the timestamp from log file to 'timestamp','hour','day','week_of_year','month','year','weekday'
 
@@ -68,7 +70,7 @@
 
 ***I double check the data with test.ipynb and songplays has all the datas.***
 
-***I also run count the number which is 6820 but I found 0 row with both song_id and artist_id***
+***I also run count the number which is 6820 and I found 1 row with both song_id and artist_id***
 
 
     

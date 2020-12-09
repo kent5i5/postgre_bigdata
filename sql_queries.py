@@ -8,13 +8,13 @@ time_table_drop = "DROP TABLE IF EXISTS time"
 
 # CREATE TABLES
 
-songplay_table_create = "CREATE TABLE IF NOT EXISTS songplays(songplay_id SERIAL PRIMARY KEY, start_time text NOT NULL,user_id text NOT NULL, level text NOT NULL, song_id text, artist_id text, session_id int NOT NULL, location text NULL, user_agent text NOT NULL)"
+songplay_table_create = "CREATE TABLE IF NOT EXISTS songplays(songplay_id SERIAL PRIMARY KEY, start_time text NOT NULL,user_id text NOT NULL, level text NOT NULL, song_id text , artist_id text, session_id int NOT NULL, location text, user_agent text)"
 
 user_table_create = "CREATE TABLE IF NOT EXISTS users (user_id int PRIMARY KEY, first_name text , last_name text , gender text, level text)"
 
-song_table_create = "CREATE TABLE IF NOT EXISTS songs (song_id text PRIMARY KEY, title text, artist_id text, year text, duration text)"
+song_table_create = "CREATE TABLE IF NOT EXISTS songs (song_id text PRIMARY KEY, title text NOT NULL, artist_id text, year text, duration float)"
 
-artist_table_create = "CREATE TABLE IF NOT EXISTS artists(artist_id text PRIMARY KEY, artist_name text NOT NULL, location text, latitude float[], longitude float[])"
+artist_table_create = "CREATE TABLE IF NOT EXISTS artists(artist_id text PRIMARY KEY, artist_name text NOT NULL, location text, latitude float, longitude float)"
 
 time_table_create = "CREATE TABLE IF NOT EXISTS time (start_time text PRIMARY KEY, hour int, day int, week int, month text, year text, weekday text)"
 
@@ -34,7 +34,8 @@ time_table_insert ="INSERT INTO time (start_time, hour, day, week, month, year, 
 
 # FIND SONGS
 
-song_select = "SELECT  a.song_id , b.artist_id FROM songs as a JOIN artists as b ON a.artist_id = b.artist_id WHERE title=(%s) AND artist_name=(%s) AND duration=(%s)"
+# song_select = "SELECT  a.song_id , b.artist_id FROM songs as a JOIN artists as b ON a.artist_id = b.artist_id WHERE title=(%s) OR artist_name=(%s) OR duration=(%s)"
+song_select = ("""select songs.song_id, artists.artist_id from songs join artists on(songs.artist_id = artists.artist_id)where songs.title = %s AND artists.artist_name = %s AND songs.duration = %s;""")
 
 # QUERY LISTS
 
